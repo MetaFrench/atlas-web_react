@@ -1,5 +1,5 @@
 {
-  "name": "task_1",
+  "name": "task_0",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -14,7 +14,6 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
-    "jquery": "^3.7.1",
-    "lodash": "^4.17.21"
+    "jquery": "^3.7.1"
   }
 }
