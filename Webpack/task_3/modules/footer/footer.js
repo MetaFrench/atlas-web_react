@@ -1,4 +1,3 @@
-// footer.js
 import $ from 'jquery';
 import './footer.css';
 
