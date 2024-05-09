@@ -1,0 +1,20 @@
+.App-header {
+    display: flex;
+  }
+  
+  h1 {
+    color: red;
+    vertical-align: middle;
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+    width: 50%;
+  }
+  
+  hr {
+    height: 3px;
+    background-color: red;
+  }
+  
+  .App-logo {
+    width: 250px;
+  }
