@@ -1,21 +1,26 @@
-import React from 'react'
+import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types';
 
-function NotificationItem({ id, type = 'default', value, html, markAsRead }) {
-  // const handleClick = () => {
-  //   markAsRead(id);
-  // };
+class NotificationItem extends PureComponent {
+  handleClick = () => {
+    const { markAsRead, id } = this.props;
+    markAsRead(id);
+  };
 
-  return (
-    <>
-      {html ? (
-        <li data-priority={type} dangerouslySetInnerHTML={html} onClick={() => markAsRead(id)}></li>
-      ) : (
-        <li data-priority={type} onClick={() => markAsRead(id)}>{value}</li>
-      )}
-    </>
-  );
-};
+  render () {
+    const { id, type = 'default', value, html } = this.props;
+
+    return (
+      <>
+        {html ? (
+          <li data-priority={type} dangerouslySetInnerHTML={html} onClick={this.handleClick}></li>
+        ) : (
+          <li data-priority={type} onClick={this.handleClick}>{value}</li>
+        )}
+      </>
+    );
+  }
+}
 
 NotificationItem.propTypes = {
   id: PropTypes.number.isRequired,

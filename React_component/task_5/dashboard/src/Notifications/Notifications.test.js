@@ -116,4 +116,55 @@ describe('Notifications component tests', () => {
     
         consoleLogSpy.mockRestore();
     });
+
+    test('when updating the props of the component with the same list, the component doesn’t rerender', () => {
+        // Initial listNotifications
+        const initialList = [
+            { id: 1, type: 'default', value: 'Notification 1' },
+            { id: 2, type: 'urgent', value: 'Notification 2' },
+        ];
+
+        // Set initial props
+        wrapper.setProps({ listNotifications: initialList });
+
+        // Spy on render method
+        const renderSpy = jest.spyOn(Notifications.prototype, 'render');
+
+        // Update props with the same list
+        wrapper.setProps({ listNotifications: initialList });
+
+        // Check if render method is not called again
+        expect(renderSpy).toHaveBeenCalledTimes(0);
+
+        renderSpy.mockRestore();
+    });
+
+    test('when updating the props of the component with a longer list, the component does rerender', () => {
+        // Initial listNotifications
+        const initialList = [
+            { id: 1, type: 'default', value: 'Notification 1' },
+            { id: 2, type: 'urgent', value: 'Notification 2' },
+        ];
+
+        const secondaryList = [
+            { id: 1, type: 'default', value: 'Notification 1' },
+            { id: 2, type: 'urgent', value: 'Notification 2' },
+            { id: 3, type: 'urgent', value: 'Notification 3' },
+            { id: 4, type: 'default', value: 'Notification 4' },
+        ];
+
+        // Set initial props
+        wrapper.setProps({ listNotifications: initialList });
+
+        // Spy on render method
+        const renderSpy = jest.spyOn(Notifications.prototype, 'render');
+
+        // Update props with the same list
+        wrapper.setProps({ listNotifications: secondaryList });
+
+        // Check if render method is not called again
+        expect(renderSpy).toHaveBeenCalledTimes(1);
+
+        renderSpy.mockRestore();
+    });
 });
