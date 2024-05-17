@@ -15,15 +15,15 @@ class NotificationItem extends PureComponent {
       <>
         {html ? (
           type === 'urgent' ? (
-            <li className={css(styles.urgent)} data-priority={type} dangerouslySetInnerHTML={html} onClick={this.handleClick}></li>
+            <li className={css(styles.urgent, styles.li)} data-priority={type} dangerouslySetInnerHTML={html} onClick={this.handleClick}></li>
           ) : (
-            <li className={css(styles.default)} data-priority={type} dangerouslySetInnerHTML={html} onClick={this.handleClick}></li>
+            <li className={css(styles.default, styles.li)} data-priority={type} dangerouslySetInnerHTML={html} onClick={this.handleClick}></li>
           )
         ) : (
           type === 'urgent' ? (
-            <li className={css(styles.urgent)} data-priority={type} onClick={this.handleClick}>{value}</li>
+            <li className={css(styles.urgent, styles.li)} data-priority={type} onClick={this.handleClick}>{value}</li>
           ) : (
-            <li className={css(styles.default)} data-priority={type} onClick={this.handleClick}>{value}</li>
+            <li className={css(styles.default, styles.li)} data-priority={type} onClick={this.handleClick}>{value}</li>
           )
           
         )}
@@ -50,6 +50,14 @@ const styles = StyleSheet.create({
   urgent: {
     color: 'red'
   },
+
+  li: {
+    '@media (max-width: 900px)': {
+      borderBottom: '1px solid black',
+      listStyleType: 'none',
+      padding: '10px 8px'
+    },
+  }
 });
 
 export default NotificationItem
