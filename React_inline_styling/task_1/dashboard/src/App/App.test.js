@@ -1,5 +1,6 @@
 import React from 'react';
 import { shallow } from 'enzyme';
+import { StyleSheetTestUtils } from 'aphrodite';
 import App from './App';
 import Notifications from '../Notifications/Notifications';
 import Header from '../Header/Header';
@@ -13,6 +14,7 @@ describe('App component tests', () => {
     // This will run before each test and create a shallow render of the App component
     beforeEach(() => {
         wrapper = shallow(<App />);
+        StyleSheetTestUtils.suppressStyleInjection();
     });
 
     afterEach(() => {
