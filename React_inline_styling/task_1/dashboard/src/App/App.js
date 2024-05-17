@@ -1,4 +1,5 @@
 import React from 'react';
+import { StyleSheet, css } from 'aphrodite';
 import PropTypes from 'prop-types';
 import Notification from '../Notifications/Notifications';
 import Header from '../Header/Header';
@@ -87,5 +88,40 @@ class App extends React.Component {
     );
   }
 }
+
+const styles = StyleSheet.create({
+  fontWeight900: {
+    fontWeight: 900
+  },
+
+  appLogo: {
+    width: '250px'
+  },
+  
+  appBody: {
+    paddingBottom: '25rem'
+  },
+  
+  login: {
+    marginTop: '3rem',
+    marginLeft: '2rem'
+  },
+  
+  email: {
+    marginLeft: '2rem'
+  },
+
+  lilSpace: {
+    marginLeft: '0.5rem'
+  },
+
+  body: {
+    fontWeight: 900
+  },
+
+  footer: {
+    fontWeight: 900
+  }
+});
 
 export default App;
