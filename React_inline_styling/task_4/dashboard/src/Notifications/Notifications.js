@@ -34,9 +34,11 @@ class Notification extends Component {
     return (
       <>
         <div className={css(styles.wholeNotification)}>
-          <div className={css(styles.menuItem)}>
+          {!displayDrawer && (
+            <div className={css(styles.menuItem)}>
             <p>Your Notifications</p>
-          </div>
+            </div>
+          )}
           {displayDrawer && (
             <div className={css(styles.Notifications)}>
               <button
@@ -72,6 +74,18 @@ class Notification extends Component {
   }
 }
 
+const opacityAnimation = {
+  '0%': { opacity: 1 },
+  '50%': { opacity: 0.5 },
+  '100%': { opacity: 1 },
+};
+
+const bounceAnimation = {
+  '0%': { transform: 'translateY(0px)' },
+  '50%': { transform: 'translateY(-5px)' },
+  '100%': { transform: 'translateY(5px)' },
+};
+
 const styles = StyleSheet.create({
   wholeNotification: {
     position: 'absolute',
@@ -87,10 +101,15 @@ const styles = StyleSheet.create({
   },
   
   menuItem: {
+    position: 'fixed',
+      right: '10px',
+    backgroundColor: '#fff8f8',
     textAlign: 'right',
-    '@media (max-width: 900px)': {
-      position: 'fixed',
-      right: '10px'
+    cursor: 'pointer',
+    ':hover': {
+      animationName: [opacityAnimation, bounceAnimation],
+      animationDuration: '1s, 0.5s',
+      animationIterationCount: '3, 3',
     },
   },
   
