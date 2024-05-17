@@ -1,5 +1,6 @@
 import React from 'react';
 import { shallow } from 'enzyme';
+import { StyleSheetTestUtils } from 'aphrodite';
 import Notifications from './Notifications';
 import NotificationItem from './NotificationItem';
 
@@ -9,6 +10,7 @@ describe('Notifications component tests', () => {
     // This will run before each test and create a shallow render of the Notifications component
     beforeEach(() => {
         wrapper = shallow(<Notifications />);
+        StyleSheetTestUtils.suppressStyleInjection();
     });
 
     test('Notifications renders without crashing', () => {
@@ -51,7 +53,10 @@ describe('Notifications component tests', () => {
     // Notification rendering tests with displayDrawer -----------------------------------
     test('Menu is being displayed when displayDrawer is false', () => {
         wrapper = shallow(<Notifications displayDrawer={false} />);
-        expect(wrapper.find('.menuItem').exists()).toBe(true);
+        const menuItem = wrapper.findWhere(node => 
+            node.prop('className') && node.prop('className').startsWith('menuItem')
+        );
+        expect(menuItem.exists()).toBe(true);
     });
 
     test('div.Notifications is not being displayed when displayDrawer is false', () => {
@@ -61,12 +66,18 @@ describe('Notifications component tests', () => {
 
     test('Menu is being displayed when displayDrawer is true', () => {
         wrapper = shallow(<Notifications displayDrawer={true} />);
-        expect(wrapper.find('.menuItem').exists()).toBe(true);
+        const menuItem = wrapper.findWhere(node => 
+            node.prop('className') && node.prop('className').startsWith('menuItem')
+        );
+        expect(menuItem.exists()).toBe(true);
     });
 
     test('div.Notifications is being displayed when displayDrawer is true', () => {
         wrapper = shallow(<Notifications displayDrawer={true} />);
-        expect(wrapper.find('.Notifications').exists()).toBe(true);
+        const notificationDiv = wrapper.findWhere(node => 
+            node.prop('className') && node.prop('className').startsWith('Notifications')
+        );
+        expect(notificationDiv.exists()).toBe(true);
     });
 
     // Notification rendering with listNotifications --------------------------
