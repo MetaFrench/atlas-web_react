@@ -1,5 +1,6 @@
 import React from 'react';
 import { shallow } from 'enzyme';
+import { StyleSheetTestUtils } from 'aphrodite';
 import Login from './Login';
 
 describe('Login component tests', () => {
@@ -8,6 +9,7 @@ describe('Login component tests', () => {
     // This will run before each test and create a shallow render of the App component
     beforeEach(() => {
         wrapper = shallow(<Login />);
+        StyleSheetTestUtils.suppressStyleInjection();
     });
 
     test('Login renders without crashing', () => {
