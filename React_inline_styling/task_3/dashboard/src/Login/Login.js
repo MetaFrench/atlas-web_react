@@ -7,9 +7,9 @@ function Login() {
       <main className='App-body'>
         <p className={css(styles.login)}>Login to access the full dashboard</p>
         <label className={css(styles.email)} htmlFor="email">Email:</label>
-        <input className={css(styles.lilSpace)} type="email" id="email" name="email"/>
+        <input className={css(styles.lilInputSpace, styles.input)} type="email" id="email" name="email"/><br className={css(styles.dontDisplay)}></br>
         <label className={css(styles.lilSpace)} htmlFor="pwd"> Password:</label>
-        <input className={css(styles.lilSpace)} type="password" id="pwd" name="pwd"/>
+        <input className={css(styles.lilInputSpace, styles.input)} type="password" id="pwd" name="pwd"/><br className={css(styles.dontDisplay)}></br>
         <button className={css(styles.lilSpace)}>OK</button>
       </main>
     </>
@@ -18,17 +18,41 @@ function Login() {
 
 const styles = StyleSheet.create({
   login: {
-    marginTop: '3rem',
-    marginLeft: '2rem'
+    '@media (min-width: 900px)': {
+      marginTop: '3rem',
+      marginLeft: '2rem'
+    }
   },
   
   email: {
-    marginLeft: '2rem'
+    '@media (min-width: 900px)': {
+      marginLeft: '2rem'
+    }
   },
 
   lilSpace: {
+    '@media (min-width: 900px)': {
+      marginLeft: '0.5rem'
+    }
+  },
+
+  lilInputSpace: {
     marginLeft: '0.5rem'
-  }
+  },
+
+  dontDisplay: {
+    '@media (min-width: 900px)': {
+      display: 'none'
+    }
+  },
+
+  input: {
+    '@media (max-width: 900px)': {
+      border: 'none',
+      background: 'none',
+      outline: 'none',
+    }
+  },
 });
 
 export default Login;
