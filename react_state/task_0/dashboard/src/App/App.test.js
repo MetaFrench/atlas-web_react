@@ -1,5 +1,6 @@
 import React from 'react';
 import { shallow } from 'enzyme';
+import { StyleSheetTestUtils } from 'aphrodite';
 import App from './App';
 import Notifications from '../Notifications/Notifications';
 import Header from '../Header/Header';
@@ -10,9 +11,9 @@ import Footer from '../Footer/Footer';
 describe('App component tests', () => {
     let wrapper;
 
-    // This will run before each test and create a shallow render of the App component
     beforeEach(() => {
         wrapper = shallow(<App />);
+        StyleSheetTestUtils.suppressStyleInjection();
     });
 
     afterEach(() => {
@@ -68,5 +69,18 @@ describe('App component tests', () => {
     
         expect(global.alert).toHaveBeenCalledWith('Logging you out');
         expect(logOutMock).toHaveBeenCalled();
+    });
+
+    test('verify that the default state for displayDrawer is false, then true after calling handleDisplayDrawer', () => {
+        expect(wrapper.state('displayDrawer')).toBe(false);
+        wrapper.instance().handleDisplayDrawer();
+        expect(wrapper.state('displayDrawer')).toBe(true);
+    });
+
+    test('verify that after calling handleHideDrawer, the state is updated to be false', () => {
+        wrapper.instance().handleDisplayDrawer();
+        expect(wrapper.state('displayDrawer')).toBe(true);
+        wrapper.instance().handleHideDrawer();
+        expect(wrapper.state('displayDrawer')).toBe(false);
     });
 });
