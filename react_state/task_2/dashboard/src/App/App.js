@@ -34,6 +34,12 @@ class App extends React.Component {
       },
       logOut: this.logOut,
       logIn: this.logIn,
+      markNotificationAsRead: this.markNotificationAsRead,
+      listNotifications: [
+        { id: 1, type: 'default', value: 'New Course Available'},
+        { id: 2, type: 'urgent', value: 'New Resume Available'},
+        { id: 3, html: { __html: getLatestNotification() }, type: 'urgent' }
+      ],
     };
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handleDisplayDrawer = this.handleDisplayDrawer.bind(this);
@@ -83,9 +89,16 @@ class App extends React.Component {
     });
   }
 
+  markNotificationAsRead = (id) => {
+    // console.log('Notification ' + id + ' is marked as read');
+    this.setState(prevState => ({
+      listNotifications: prevState.listNotifications.filter(notification => notification.id !== id)
+    }));
+  }
+
   render() {
     // const { isLoggedIn } = this.props;
-    const { displayDrawer, user } = this.state;
+    const { displayDrawer, user, listNotifications } = this.state;
 
     const listCourses = [
       { id: 1, name: 'ES6', credit: 60 },
@@ -93,19 +106,20 @@ class App extends React.Component {
       { id: 3, name: 'React', credit: 40 },
     ]
   
-    const listNotifications = [
-      { id: 1, type: 'default', value: 'New Course Available'},
-      { id: 2, type: 'urgent', value: 'New Resume Available'},
-      { id: 3, html: { __html: getLatestNotification() }, type: 'urgent' }
-    ]
+    // const listNotifications = [
+    //   { id: 1, type: 'default', value: 'New Course Available'},
+    //   { id: 2, type: 'urgent', value: 'New Resume Available'},
+    //   { id: 3, html: { __html: getLatestNotification() }, type: 'urgent' }
+    // ]
 
     return (
-      <AppContext.Provider value={{ user: this.state.user, logOut: this.state.logOut, logIn: this.state.logIn }}>
+      <AppContext.Provider value={{ user: this.state.user, logOut: this.state.logOut, logIn: this.state.logIn, markNotificationAsRead: this.state.markNotificationAsRead }}>
         <Notification
           displayDrawer={this.state.displayDrawer}
           handleDisplayDrawer={this.handleDisplayDrawer}
           handleHideDrawer={this.handleHideDrawer}
-          listNotifications={listNotifications} 
+          listNotifications={this.state.listNotifications}
+          markNotificationAsRead={this.state.markNotificationAsRead}
         />
         <div className='App'>
           <Header />
