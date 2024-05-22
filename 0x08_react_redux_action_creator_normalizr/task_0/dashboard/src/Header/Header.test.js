@@ -1,5 +1,6 @@
 import React from 'react';
 import { shallow } from 'enzyme';
+import { StyleSheetTestUtils } from 'aphrodite';
 import Header from './Header';
 
 describe('Header component tests', () => {
@@ -8,6 +9,7 @@ describe('Header component tests', () => {
     // This will run before each test and create a shallow render of the App component
     beforeEach(() => {
         wrapper = shallow(<Header />);
+        StyleSheetTestUtils.suppressStyleInjection();
     });
 
     test('Header renders without crashing', () => {
@@ -15,7 +17,10 @@ describe('Header component tests', () => {
     });
 
     test('Header renders a div with the class App-header', () => {
-      expect(wrapper.find('.App-header').length).toBe(1);
+      const header = wrapper.find('header')
+      expect(header.exists()).toBe(true);
+      expect(header.prop('className')).toBeDefined();
+      expect(header.prop('className')).toContain('appHeader');
     });
 
     test('Header renders an img element', () => {

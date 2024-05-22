@@ -1,8 +1,13 @@
 import React from 'react';
 import { shallow } from 'enzyme';
+import { StyleSheetTestUtils } from 'aphrodite';
 import CourseList from './CourseList';
 
 describe('CourseList component tests', () => {
+  beforeEach(() => {
+    StyleSheetTestUtils.suppressStyleInjection();
+  });
+  
   test('Renders CourseList component without crashing', () => {
       const wrapper = shallow(<CourseList />);
       expect(wrapper.exists()).toBe(true);

@@ -7,16 +7,12 @@ import { NotificationItemShape } from './NotificationItemShape';
 class Notification extends Component {
   static propTypes = {
     displayDrawer: PropTypes.bool,
-    listNotifications: PropTypes.arrayOf(NotificationItemShape),
-    handleDisplayDrawer: PropTypes.func,
-    handleHideDrawer: PropTypes.func
+    listNotifications: PropTypes.arrayOf(NotificationItemShape)
   }
 
   static defaultProps = {
     displayDrawer: true,
     listNotifications: [],
-    handleDisplayDrawer: () => {},
-    handleHideDrawer: () => {}
   };
 
   constructor(props) {
@@ -29,17 +25,17 @@ class Notification extends Component {
   }
 
   shouldComponentUpdate(nextProps) {
-    return nextProps.listNotifications.length > this.props.listNotifications.length || nextProps.displayDrawer !== this.props.displayDrawer;
+    return nextProps.listNotifications.length > this.props.listNotifications.length;
   }
 
   render () {
-    const { displayDrawer, listNotifications, handleDisplayDrawer, handleHideDrawer } = this.props;
+    const { displayDrawer, listNotifications } = this.props;
 
     return (
       <>
         <div className={css(styles.wholeNotification)}>
           {!displayDrawer && (
-            <div className={css(styles.menuItem)} onClick={handleDisplayDrawer}>
+            <div className={css(styles.menuItem)}>
             <p>Your Notifications</p>
             </div>
           )}
@@ -48,7 +44,7 @@ class Notification extends Component {
               <button
                 className='close-button'
                 type='button'
-                onClick={handleHideDrawer}
+                onClick={() => console.log('Close button has been clicked')}
                 style={{ display: 'inline', position: 'absolute', top: '1px', right: '1px', background: 'none', border: 'none' }}
                 aria-label='Close'
               >

@@ -64,13 +64,13 @@ describe('Notifications component tests', () => {
         expect(wrapper.find('.Notifications').exists()).toBe(false);
     });
 
-    // test('Menu is being displayed when displayDrawer is true', () => {
-    //     wrapper = shallow(<Notifications displayDrawer={true} />);
-    //     const menuItem = wrapper.findWhere(node => 
-    //         node.prop('className') && node.prop('className').startsWith('menuItem')
-    //     );
-    //     expect(menuItem.exists()).toBe(true);
-    // });
+    test('Menu is being displayed when displayDrawer is true', () => {
+        wrapper = shallow(<Notifications displayDrawer={true} />);
+        const menuItem = wrapper.findWhere(node => 
+            node.prop('className') && node.prop('className').startsWith('menuItem')
+        );
+        expect(menuItem.exists()).toBe(true);
+    });
 
     test('div.Notifications is being displayed when displayDrawer is true', () => {
         wrapper = shallow(<Notifications displayDrawer={true} />);
@@ -129,23 +129,29 @@ describe('Notifications component tests', () => {
     });
 
     test('when updating the props of the component with the same list, the component doesn’t rerender', () => {
+        // Initial listNotifications
         const initialList = [
             { id: 1, type: 'default', value: 'Notification 1' },
             { id: 2, type: 'urgent', value: 'Notification 2' },
         ];
 
+        // Set initial props
         wrapper.setProps({ listNotifications: initialList });
 
+        // Spy on render method
         const renderSpy = jest.spyOn(Notifications.prototype, 'render');
 
+        // Update props with the same list
         wrapper.setProps({ listNotifications: initialList });
 
+        // Check if render method is not called again
         expect(renderSpy).toHaveBeenCalledTimes(0);
 
         renderSpy.mockRestore();
     });
 
     test('when updating the props of the component with a longer list, the component does rerender', () => {
+        // Initial listNotifications
         const initialList = [
             { id: 1, type: 'default', value: 'Notification 1' },
             { id: 2, type: 'urgent', value: 'Notification 2' },
@@ -158,36 +164,18 @@ describe('Notifications component tests', () => {
             { id: 4, type: 'default', value: 'Notification 4' },
         ];
 
+        // Set initial props
         wrapper.setProps({ listNotifications: initialList });
 
+        // Spy on render method
         const renderSpy = jest.spyOn(Notifications.prototype, 'render');
 
+        // Update props with the same list
         wrapper.setProps({ listNotifications: secondaryList });
 
+        // Check if render method is not called again
         expect(renderSpy).toHaveBeenCalledTimes(1);
 
         renderSpy.mockRestore();
-    });
-
-    test('verify that clicking on the menu item calls handleDisplayDrawer', () => {
-        const handleDisplayDrawerMock = jest.fn();
-        const wrapper = shallow(<Notifications listNotifications={[]} handleDisplayDrawer={handleDisplayDrawerMock} handleHideDrawer={() => {}} displayDrawer={false} />);
-        
-        const menuItem = wrapper.findWhere(node =>
-            node.prop('className') && node.prop('className').startsWith('menuItem')
-        );
-        menuItem.simulate('click');
-    
-        expect(handleDisplayDrawerMock).toHaveBeenCalled();
-    });
-
-    test('verify that clicking on the button calls handleHideDrawer', () => {
-        const handleHideDrawerMock = jest.fn();
-        const wrapper = shallow(<Notifications listNotifications={[]} handleDisplayDrawer={() => {}} handleHideDrawer={handleHideDrawerMock} displayDrawer={true} />);
-        
-        const closeButton = wrapper.find('.close-button');
-        closeButton.simulate('click');
-    
-        expect(handleHideDrawerMock).toHaveBeenCalled();
     });
 });
