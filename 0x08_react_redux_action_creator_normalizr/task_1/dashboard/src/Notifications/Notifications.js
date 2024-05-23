@@ -1,42 +1,48 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { StyleSheet, css } from 'aphrodite';
 import PropTypes from 'prop-types';
 import NotificationItem from './NotificationItem'
 import { NotificationItemShape } from './NotificationItemShape';
 
-class Notification extends Component {
+class Notification extends PureComponent {
   static propTypes = {
     displayDrawer: PropTypes.bool,
-    listNotifications: PropTypes.arrayOf(NotificationItemShape)
+    listNotifications: PropTypes.arrayOf(NotificationItemShape),
+    handleDisplayDrawer: PropTypes.func,
+    handleHideDrawer: PropTypes.func,
+    markNotificationAsRead: PropTypes.func
   }
 
   static defaultProps = {
     displayDrawer: true,
     listNotifications: [],
+    handleDisplayDrawer: () => {},
+    handleHideDrawer: () => {},
+    markNotificationAsRead: () => {}
   };
 
-  constructor(props) {
-    super(props);
-    this.markAsRead = this.markAsRead.bind(this);
-  }
+  // constructor(props) {
+  //   super(props);
+  //   this.markAsRead = this.markAsRead.bind(this);
+  // }
 
-  markAsRead(id) {
-    console.log(`Notification ${id} has been marked as read`);
-  }
+  // markAsRead(id) {
+  //   console.log(`Notification ${id} has been marked as read`);
+  // }
 
-  shouldComponentUpdate(nextProps) {
-    return nextProps.listNotifications.length > this.props.listNotifications.length;
-  }
+  // shouldComponentUpdate(nextProps) {
+  //   return nextProps.listNotifications.length > this.props.listNotifications.length || nextProps.displayDrawer !== this.props.displayDrawer;
+  // }
 
   render () {
-    const { displayDrawer, listNotifications } = this.props;
+    const { displayDrawer, listNotifications, handleDisplayDrawer, handleHideDrawer, markNotificationAsRead } = this.props;
 
     return (
       <>
         <div className={css(styles.wholeNotification)}>
           {!displayDrawer && (
-            <div className={css(styles.menuItem)}>
-            <p>Your Notifications</p>
+            <div className={css(styles.menuItem)} onClick={handleDisplayDrawer}>
+              <p>Your Notifications</p>
             </div>
           )}
           {displayDrawer && (
@@ -44,7 +50,7 @@ class Notification extends Component {
               <button
                 className='close-button'
                 type='button'
-                onClick={() => console.log('Close button has been clicked')}
+                onClick={handleHideDrawer}
                 style={{ display: 'inline', position: 'absolute', top: '1px', right: '1px', background: 'none', border: 'none' }}
                 aria-label='Close'
               >
@@ -57,11 +63,14 @@ class Notification extends Component {
                   <p>Here is the list of notifications</p>
                   <ul className={css(styles.ul)}>
                     {listNotifications.map((notification) => (
-                      notification.type === 'urgent' ? (
-                        <NotificationItem key={notification.id} id={notification.id} html={notification.html} type={notification.type} value={notification.value} markAsRead={this.markAsRead} />
-                      ) : (
-                        <NotificationItem key={notification.id} id={notification.id} html={notification.html} type={notification.type} value={notification.value} markAsRead={this.markAsRead} />
-                      )
+                      <NotificationItem
+                        key={notification.id}
+                        id={notification.id}
+                        html={notification.html}
+                        type={notification.type}
+                        value={notification.value}
+                        markAsRead={() => markNotificationAsRead(notification.id)}
+                      />
                     ))}
                   </ul>
                 </>
@@ -70,7 +79,7 @@ class Notification extends Component {
           )}
         </div>
       </>
-    )
+    );
   }
 }
 
@@ -102,7 +111,7 @@ const styles = StyleSheet.create({
   
   menuItem: {
     position: 'fixed',
-      right: '10px',
+    right: '10px',
     backgroundColor: '#fff8f8',
     textAlign: 'right',
     cursor: 'pointer',
@@ -132,4 +141,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Notification
+export default Notification;

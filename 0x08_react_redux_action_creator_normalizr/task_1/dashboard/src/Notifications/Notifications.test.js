@@ -6,12 +6,17 @@ import NotificationItem from './NotificationItem';
 
 describe('Notifications component tests', () => {
     let wrapper;
+    const mockMarkNotificationAsRead = jest.fn();
 
     // This will run before each test and create a shallow render of the Notifications component
     beforeEach(() => {
         wrapper = shallow(<Notifications />);
         StyleSheetTestUtils.suppressStyleInjection();
     });
+
+    afterEach(() => {
+        jest.clearAllMocks();
+      });
 
     test('Notifications renders without crashing', () => {
         expect(wrapper.exists()).toBe(true);
@@ -64,14 +69,6 @@ describe('Notifications component tests', () => {
         expect(wrapper.find('.Notifications').exists()).toBe(false);
     });
 
-    test('Menu is being displayed when displayDrawer is true', () => {
-        wrapper = shallow(<Notifications displayDrawer={true} />);
-        const menuItem = wrapper.findWhere(node => 
-            node.prop('className') && node.prop('className').startsWith('menuItem')
-        );
-        expect(menuItem.exists()).toBe(true);
-    });
-
     test('div.Notifications is being displayed when displayDrawer is true', () => {
         wrapper = shallow(<Notifications displayDrawer={true} />);
         const notificationDiv = wrapper.findWhere(node => 
@@ -92,7 +89,7 @@ describe('Notifications component tests', () => {
         expect(wrapper.text().includes('No new notification for now')).toBe(true);
     });
 
-    test(' when you pass a list of notifications, the component renders it correctly and with the right number of NotificationItem', () => {
+    test('When you pass a list of notifications, the component renders it correctly and with the right number of NotificationItem', () => {
         const listNotifications = [
             { id: 1, type: 'default', value: 'New Course Available' },
             { id: 2, type: 'urgent', value: 'New Resume Available' },
@@ -110,48 +107,37 @@ describe('Notifications component tests', () => {
     });
 
     test('when calling the function markAsRead on an instance of the component, the spy is being called with the right message', () => {
-        const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
-    
         const listNotifications = [
             { id: 1, type: 'default', value: 'New Course Available' },
             { id: 2, type: 'urgent', value: 'New Resume Available' },
             { id: 3, type: 'urgent', html: { __html: 'Urgent requirement - complete by EOD' } },
         ];
     
-        wrapper = shallow(<Notifications listNotifications={listNotifications} />);
+        wrapper = shallow(<Notifications displayDrawer={true} listNotifications={listNotifications} markNotificationAsRead={mockMarkNotificationAsRead}/>);
     
-        const instance = wrapper.instance();
-        instance.markAsRead(1);
-    
-        expect(consoleLogSpy).toHaveBeenCalledWith('Notification 1 has been marked as read');
-    
-        consoleLogSpy.mockRestore();
+        const firstNotificationItem = wrapper.find(NotificationItem).first();
+        firstNotificationItem.prop('markAsRead')(1);
+        expect(mockMarkNotificationAsRead).toHaveBeenCalledWith(1);
     });
 
     test('when updating the props of the component with the same list, the component doesn’t rerender', () => {
-        // Initial listNotifications
         const initialList = [
             { id: 1, type: 'default', value: 'Notification 1' },
             { id: 2, type: 'urgent', value: 'Notification 2' },
         ];
 
-        // Set initial props
         wrapper.setProps({ listNotifications: initialList });
 
-        // Spy on render method
         const renderSpy = jest.spyOn(Notifications.prototype, 'render');
 
-        // Update props with the same list
         wrapper.setProps({ listNotifications: initialList });
 
-        // Check if render method is not called again
         expect(renderSpy).toHaveBeenCalledTimes(0);
 
         renderSpy.mockRestore();
     });
 
     test('when updating the props of the component with a longer list, the component does rerender', () => {
-        // Initial listNotifications
         const initialList = [
             { id: 1, type: 'default', value: 'Notification 1' },
             { id: 2, type: 'urgent', value: 'Notification 2' },
@@ -164,18 +150,36 @@ describe('Notifications component tests', () => {
             { id: 4, type: 'default', value: 'Notification 4' },
         ];
 
-        // Set initial props
         wrapper.setProps({ listNotifications: initialList });
 
-        // Spy on render method
         const renderSpy = jest.spyOn(Notifications.prototype, 'render');
 
-        // Update props with the same list
         wrapper.setProps({ listNotifications: secondaryList });
 
-        // Check if render method is not called again
         expect(renderSpy).toHaveBeenCalledTimes(1);
 
         renderSpy.mockRestore();
+    });
+
+    test('verify that clicking on the menu item calls handleDisplayDrawer', () => {
+        const handleDisplayDrawerMock = jest.fn();
+        const wrapper = shallow(<Notifications listNotifications={[]} handleDisplayDrawer={handleDisplayDrawerMock} handleHideDrawer={() => {}} displayDrawer={false} />);
+        
+        const menuItem = wrapper.findWhere(node =>
+            node.prop('className') && node.prop('className').startsWith('menuItem')
+        );
+        menuItem.simulate('click');
+    
+        expect(handleDisplayDrawerMock).toHaveBeenCalled();
+    });
+
+    test('verify that clicking on the button calls handleHideDrawer', () => {
+        const handleHideDrawerMock = jest.fn();
+        const wrapper = shallow(<Notifications listNotifications={[]} handleDisplayDrawer={() => {}} handleHideDrawer={handleHideDrawerMock} displayDrawer={true} />);
+        
+        const closeButton = wrapper.find('.close-button');
+        closeButton.simulate('click');
+    
+        expect(handleHideDrawerMock).toHaveBeenCalled();
     });
 });
