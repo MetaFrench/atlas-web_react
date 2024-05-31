@@ -5,24 +5,21 @@ Atlast T5 React State React Redux Action Creator Normalizr Project
 <a name="Sections"></a>
 1. [Learning Objectives](#learningObjectives)
 2. [Requirements](#requirements)
-4. [Task 0. Read data from a JSON](#readDataFromAJson)
-5. [Task 1. Normalize a nested JSON](#normalizeNestedJson)
-6. [Task 2. Filter a normalized Schema](#filterNormalizedSchema)
-7. [Task 3. Create actions for the course list](#createActionsForTheCourseList)
-8. [Task 4. Create actions for the UI](#createActionsForTheUI)
-9. [Task 5. Create actions for the notification list](#createActionsForTheNoticicationList)
-10. [Task 6. Bound the Actions](#boundTheActions)
-11. [Task 7. Async Action Creators](#asyncActionCreators)
+4. [Task 0. Write a basic reducer](#writeBasicReducer)
+5. [Task 1. Use Immutable for the UI Reducer](#UseImmutableUIReducer)
+6. [Task 2. Create a reducer for Courses](#createReducerForCourses)
+7. [Task 3. Create the reducer for notifications](#createReducerForNotification)
+8. [Task 4. Normalizr & Immutable](#NormalizrAndImmutable)
+9. [Task 5. Selectors](#selectors)
 __________________________________________________________________________________________________________________________________________
 ## Learning Objectives
 <a name="learningObjectives"></a>
-- Normalizr’s purpose and how to use it
-- Schemas and normalization of nested JSON
-- Core concepts of Redux
-- Redux actions
-- Redux action creators
-- Async actions in Redux
-- How to write tests for Redux
+- The purpose of a reducer and the role it plays within your application
+- Why a reducer should stay as pure as possible
+- Why mutations should not happen within a reducer
+- The use of Immutable within the reducer
+- The use of Normalizr within the app
+- Selectors: what they are and when to use them
 
 [Back to top](#Sections)
 __________________________________________________________________________________________________________________________________________
@@ -37,345 +34,430 @@ ________________________________________________________________________________
 
 [Back to top](#Sections)
 __________________________________________________________________________________________________________________________________________
-## Task 0. Read data from a JSON
-<a name="readDataFromAJson"></a>
+## Task 0. Write a basic reducer
+<a name="writeBasicReducer"></a>
 
-### Reuse the latest dashboard project you worked on in the React course 0x06-React_state
+#### Reuse the latest dashboard project you worked on in the React course 0x08-React_Redux_action_creator+normalizr
 
-#### For this task, place notifications.json into the root of the project directory and use the data inside for the next step.
+### Create the basic state
+#### In a file named reducers/uiReducer.js, define the initial state of the reducer for the UI:
+- It should have one boolean property isNotificationDrawerVisible
+- It should have one boolean property isUserLoggedIn
+- It should have one empty object user
 
-### Create a new notifications.js file in a schema folder:
-- Import the JSON data from notifications.json and give it a name. Try import * as [variable name] from [path to notifications.json]
-- Create a function named getAllNotificationsByUser that accepts userId as an argument
-- The function should return a list containing all the context objects from the notifications.json data when the author id is the same as the userId
+#### Create the reducer function
+#### In the same file, import all the actions that you created in the file actions/uiActionTypes and create a reducer function named uiReducer:
+- DISPLAY_NOTIFICATION_DRAWER should set isNotificationDrawerVisible to true
+- HIDE_NOTIFICATION_DRAWER should set isNotificationDrawerVisible to false
+- LOGIN_SUCCESS should set isUserLoggedIn to true
+- LOGIN_FAILURE should set isUserLoggedIn to false
+- LOGOUT should set isUserLoggedIn to false
 
-### In the same schema directory, create a notifications.test.js file:
-- Add a test that uses the id 5debd764a7c57c7839d722e9 and verifies that the following data is returned:
+### Write the tests
+#### In a file named reducers/uiReducer.test.js, define the test suite for our simple reducer:
+- Write a test verifying the state returned by the uiReducer function equals the initial state when no action is passed
+- Write a test verifying the state returned by the uiReducer function equals the initial state when the action SELECT_COURSE is passed
+- Write a test verifying the state returned by the uiReducer function, when the action DISPLAY_NOTIFICATION_DRAWER is passed, changes correctly the isNotificationDrawerVisible property
+
+### Tips:
+- Don’t forget to set up the default case in your switch function
+
+### Requirements:
+- You should not mutate the state within the reducer
+- You must use the spread operator to change the state
+- All the tests in the project should pass
+
+#### Repo:
+- GitHub repository: atlas-web_react
+- Directory: react_redux_reducer_selector
+- File: task_0/dashboard/src/reducers/uiReducer.js, task_0/dashboard/src/reducers/uiReducer.test.js
+
+[Back to top](#Sections)
+__________________________________________________________________________________________________________________________________________
+## Task 1. Use Immutable for the UI Reducer
+<a name="UseImmutableUIReducer"></a>
+
+#### Now that you have set up a basic reducer, let’s reuse what we learned in the Immutable module and apply it to that reducer:
+- Install Immutable.js within the project
+- Update the uiReducer.js file to use Map from Immutable.js
+- Update the different part of the reducer function to use set from Map
+- Update the test suite, so it takes into account the changes
+
+### Tips:
+- You can use the toJS function within your tests for an easy comparison
+- Remember that Immutable.js always return a new Map after a modification
+
+### Requirements:
+- For better performances, do not use any fromJS, toJS function within the reducer
+- All the tests in the project should pass
+
+#### Repo:
+- GitHub repository: atlas-web_react
+- Directory: react_redux_reducer_selector
+- File: task_1/dashboard/src/reducers/uiReducer.js, task_1/dashboard/src/reducers/uiReducer.test.js
+
+[Back to top](#Sections)
+__________________________________________________________________________________________________________________________________________
+## Task 2. Create a reducer for Courses
+<a name="createReducerForCourses"></a>
+
+### Create a load action
+#### In the courseActionTypes file, create a new action corresponding to when the API returns the list of courses. You can name it FETCH_COURSE_SUCCESS
+
+### Create the course reducer and default state
+#### In a file courseReducer.js, write a reducer function. The default state should be an empty array.
+
+### Define the FETCH_COURSE_SUCCESS action
+#### When the action creator sends the action FETCH_COURSE_SUCCESS, it also sends the list of courses in a data attribute. The action would look like:
+
+```
+{
+  type: FETCH_COURSE_SUCCESS,
+  data: [
+    {
+      id: 1,
+      name: "ES6",
+      credit: 60
+    },
+    {
+      id: 2,
+      name: "Webpack",
+      credit: 20
+    },
+    {
+      id: 3,
+      name: "React",
+      credit: 40
+    }
+  ]
+}
+```
+
+#### When updating the state of the reducer, you should also set the attribute isSelected to false for every item in the list. The expected data from the reducer should be:
 
 ```
 [
   {
-    guid: "2d8e40be-1c78-4de0-afc9-fcc147afd4d2",
-    isRead: true,
-    type: "urgent",
-    value:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt."
+    id: 1,
+    name: "ES6",
+    isSelected: false,
+    credit: 60
   },
   {
-    guid: "280913fe-38dd-4abd-8ab6-acdb4105f922",
-    isRead: false,
-    type: "urgent",
-    value:
-      "Non diam phasellus vestibulum lorem sed risus ultricies. Tellus mauris a diam maecenas sed"
+    id: 2,
+    name: "Webpack",
+    isSelected: false,
+    credit: 20
+  },
+  {
+    id: 3,
+    name: "React",
+    isSelected: false,
+    credit: 40
   }
 ]
 ```
 
-### Tips:
-- You can easily import JSON data using Babel
-- When writing your test, you can use the arrayContaining method from Jest to easily compare what the function returns and what you are expecting
-
-### Requirements:
-- You can use any loop function to go through the array
-- All the tests in the project should pass
-
-#### Repo:
-- GitHub repository: atlas-web_react
-- Directory: 0x08_react_redux_action_creator_normalizr
-- File: task_0/dashboard/src/schema/notifications.js, task_0/dashboard/src/schema/notifications.test.js
-
-[Back to top](#Sections)
-__________________________________________________________________________________________________________________________________________
-## Task 1. Normalize a nested JSON
-<a name="normalizeNestedJson"></a>
-
-#### Copy over dashboard from the previous task into a task_1 directory at the root of the project
-
-#### Modify src/schema/notifications.js to set up a schema using Normalizr
-
-#### You’re going to use schema.Entity to create a 3 of entities.
-
-#### The first one is an example the task will provide for you.
-
-`const user = new schema.Entity("users")`
-
-- Create a message entity in a variable called message whose key is messages and set the idAttribute to the string guid in the options
-- Create a notification entity in a variable called notification whose key is notifications and set the definition of the entity as so:
-  - author: user
-  - context: message
-
-#### Add a test in schema/notifications.test.js to verify that your normalized data has a correct result array. It should contain:
+### Define the SELECT_COURSE and UNSELECT_COURSE actions
+#### When the action creator sends the action SELECT_COURSE, it also sends an index corresponding to the id of the course to update. The action would look like:
 
 ```
-  "5debd76480edafc8af244228"
-  "5debd764507712e7a1307303"
-  "5debd76444dd4dafea89d53b"
-  "5debd76485ee4dfd1284f97b"
-  "5debd7644e561e022d66e61a"
-  "5debd7644aaed86c97bf9d5e"
-  "5debd76413f0d5e5429c28a0"
-  "5debd7642e815cd350407777"
-  "5debd764c1127bc5a490a4d0"
-  "5debd7646ef31e0861ec1cab"
-  "5debd764a4f11eabef05a81d"
-  "5debd764af0fdd1fc815ad9b"
-  "5debd76468cb5b277fd125f4"
-  "5debd764de9fa684468cdc0b"
+{
+  type: SELECT_COURSE,
+  index: 2
+}
+The expected data from the reducer should be:
+
+[
+  {
+    id: 1,
+    name: "ES6",
+    isSelected: false,
+    credit: 60
+  },
+  {
+    id: 2,
+    name: "Webpack",
+    isSelected: true,
+    credit: 20
+  },
+  {
+    id: 3,
+    name: "React",
+    isSelected: false,
+    credit: 40
+  }
+]
 ```
 
-#### Add a test to verify that your normalized data has a correct users entity. Test to access the user with the id 5debd764a7c57c7839d722e9. It should return:
+#### When the action creator sends the action UNSELECT_COURSE, it also sends an index corresponding to the id of the course to update. The action would look like:
 
 ```
-  age: 25,
-  email: "poole.sanders@holberton.nz",
-  id: "5debd764a7c57c7839d722e9",
-  name: { first: "Poole", last: "Sanders" },
-  picture: "http://placehold.it/32x32"
+{
+  type: UNSELECT_COURSE,
+  index: 2
+}
+The expected data from the reducer should be:
+
+[
+  {
+    id: 1,
+    name: "ES6",
+    isSelected: false,
+    credit: 60
+  },
+  {
+    id: 2,
+    name: "Webpack",
+    isSelected: false,
+    credit: 20
+  },
+  {
+    id: 3,
+    name: "React",
+    isSelected: false,
+    credit: 40
+  }
+]
 ```
 
-#### Add a test to verify that your normalized data has a correct messages entity. Test to access the message with the guid efb6c485-00f7-4fdf-97cc-5e12d14d6c41. It should return:
-
-```
-  guid: "efb6c485-00f7-4fdf-97cc-5e12d14d6c41",
-  isRead: false,
-  type: "default",
-  value: "Cursus risus at ultrices mi."
-```
-
-#### Add a test to verify that your normalized data has a correct notifications entity. Test to access the notification with the id 5debd7642e815cd350407777. It should return:
-
-```
-  author: "5debd764f8452ef92346c772",
-  context: "3068c575-d619-40af-bf12-dece1ee18dd3",
-  id: "5debd7642e815cd350407777"
-```
+### Write the tests
+#### In a courseReducer.test.js, write a test suite for the new reducer. Define the following tests:
+- Test that the default state returns an empty array
+- Test that FETCH_COURSE_SUCCESS returns the data passed
+- Test that SELECT_COURSE returns the data with the right item updated
+- Test that UNSELECT_COURSE returns the data with the right item updated
 
 ### Tips:
-- The expected goal is to obtain a very easy to use dataset
-- If you are having undefined issues, look at idAttribute from the Normalizr documentation
+- Use ES6 for this reducer, we can look at Immutable later
 
 ### Requirements:
-- You must export the list of notifications using a Normalizr’s normalize
+- Try to make the update of object as efficient as possible, for example you can use ES6 Map
 - All the tests in the project should pass
 
 #### Repo:
 - GitHub repository: atlas-web_react
-- Directory: 0x08_react_redux_action_creator_normalizr
-- File: task_1/dashboard/src/schema/notifications.js, task_1/dashboard/src/schema/notifications.test.js
+- Directory: react_redux_reducer_selector
+- File: task_2/dashboard/src/actions/courseActionTypes.js, task_2/dashboard/src/reducers/courseReducer.js, task_2/dashboard/src/reducers/courseReducer.test.js
 
 [Back to top](#Sections)
 __________________________________________________________________________________________________________________________________________
-## Task 2. Filter a normalized Schema
-<a name="filterNormalizedSchema"></a>
+## Task 3. Create the reducer for notifications
+<a name="createReducerForNotification"></a>
 
-#### Copy the contents of dashboard from the task_1 directory into a task_2 directory at the root of the project
+### Create a load action
+#### In the notificationActionTypes file, create a new action corresponding to when the API returns the list of notifications. You can name it FETCH_NOTIFICATIONS_SUCCESS
 
-#### Modify the function getAllNotificationsByUser to use the normalized dataset
+### Create the notifications reducer and default state
+#### In a file notificationReducer.js, write a reducer function. The default state should be an object with:
+- notifications, which will store the list of notifications
+- filter, which will be the attribute storing which filter is selected
 
-### Requirements:
-- You should only use one loop at this point
-- You should not use Object.keys
-- You should not have to modify the test, and the test should pass correctly
-- All the tests in the project should pass
+### Define the FETCH_NOTIFICATIONS_SUCCESS action
+#### When the action creator sends the action FETCH_NOTIFICATIONS_SUCCESS, it also sends the list of notifications in a data attribute. The action would look like:
 
-#### Repo:
-- GitHub repository: atlas-web_react
-- Directory: 0x08_react_redux_action_creator_normalizr
-- File: task_2/dashboard/src/schema/notifications.js
+```
+{
+  type: FETCH_NOTIFICATIONS_SUCCESS,
+  data: [
+    {
+      id: 1,
+      type: "default",
+      value: "New course available"
+    },
+    {
+      id: 2,
+      type: "urgent",
+      value: "New resume available"
+    },
+    {
+      id: 3,
+      type: "urgent",
+      value: "New data available"
+    }
+  ]
+}
+```
 
-[Back to top](#Sections)
-__________________________________________________________________________________________________________________________________________
-## Task 3. Create actions for the course list
-<a name="createActionsForTheCourseList"></a>
+#### When updating the state of the reducer, you should also set the attribute isRead to false for every item in the list. The expected data from the reducer should be:
 
-#### Copy the dashboard folder from the task_2 directory into a directory named task_3
+```
+{
+  filter: "DEFAULT",
+  notifications: [
+    {
+      id: 1,
+      isRead: false,
+      type: "default",
+      value: "New course available"
+    },
+    {
+      id: 2,
+      isRead: false,
+      type: "urgent",
+      value: "New resume available"
+    },
+    {
+      id: 3,
+      isRead: false,
+      type: "urgent",
+      value: "New data available"
+    }
+  ]
+}
+```
 
-#### Create a new folder named actions
-
-### Create the action types:
-#### In a file named courseActionTypes.js, create two action types:
-- SELECT_COURSE
-- UNSELECT_COURSE
-
-#### They will be used to define if a user selected or unselected a specific course
-
-### Create the action creators:
-#### In a file named courseActionCreators.js, create two action creators that will send the two types we previously created:
-- The function selectCourse will accept index as argument
-- The function unSelectCourse will accept index as argument
-
-### Test the action creators:
-#### In a file named courseActionCreators.test.js, write a test for the selectCourse action. Calling the creator with 1 as argument should return: { type: SELECT_COURSE, index: 1 }
-
-#### Write a test for the unSelectCourse action. Calling the creator with 1 as argument should return: { type: UNSELECT_COURSE, index: 1 }
-
-#### Repo:
-- GitHub repository: atlas-web_react
-- Directory: 0x08_react_redux_action_creator_normalizr
-- File: task_3/dashboard/src/actions/courseActionCreators.js, task_3/dashboard/src/actions/courseActionCreators.test.js, task_3/dashboard/src/actions/courseActionTypes.js
-
-[Back to top](#Sections)
-
-__________________________________________________________________________________________________________________________________________
-## Task 4. Create actions for the UI
-<a name="createActionsForTheUI"></a>
-
-#### Copy the dashboard folder from task_3 into a directory labeled task_4
-
-#### In src/actions/uiActionTypes.js, create four action types:
-
-#### e.g . export const LOGIN = "LOGIN"
-
-### Create the action types:
-- LOGIN
-- LOGOUT
-- DISPLAY_NOTIFICATION_DRAWER
-- HIDE_NOTIFICATION_DRAWER
-
-#### They will be used to define when a user is logging in, logging out, and display / hide the notifications drawer
-
-### Create the action creator:
-#### In a file named uiActionCreators.js, the goal of this section is to create four action creators that will send the four types we previously created. Remember to import all the types from uiActionTypes in this file.
-- The function login will accept email and password as arguments. It will return the action with LOGIN as a type and the user object:
-
-`{ user : { email, password } }`
-
-- The function logout will create the action with the type LOGOUT
-- The function displayNotificationDrawer will create the action with the type DISPLAY_NOTIFICATION_DRAWER
-- The function hideNotificationDrawer will create the action with the type HIDE_NOTIFICATION_DRAWER
-
-### Test the action creators:
-#### In a file named uiActionCreators.test.js, write a test for each of the action creator you wrote previously.
-
-#### Repo:
-- GitHub repository: atlas-web_react
-- Directory: 0x08_react_redux_action_creator_normalizr
-- File: task_4/dashboard/src/actions/uiActionTypes.js, task_4/dashboard/src/actions/uiActionCreators.js, task_4/dashboard/src/actions/uiActionCreators.test.js
-
-[Back to top](#Sections)
-__________________________________________________________________________________________________________________________________________
-## Task 5. Create actions for the notification list
-<a name="createActionsForTheNoticicationList"></a>
-
-#### Copy dashboard from the task_4 directory into task_5
-
-### Create the action types
-#### In src/actions/notificationActionTypes.js, create two action types:
-- MARK_AS_READ
-- SET_TYPE_FILTER
-
-### Create the filter states
-#### In src/actions/notificationActionTypes.js, create a constant named NotificationTypeFilters, that will contain the two filter states:
-- DEFAULT
-- URGENT
-
-#### They will be used when the user interacts with the notification drawer
-
-### Create the action creator
-
-#### Import the action types you just created in src/actions/notificationActionTypes.js
-
-#### In a file named notificationActionCreators.js, create two action creators that will send the two action types we previously created:
-- The function markAsread will accept index as argument
-- The function setNotificationFilter will accept filter as argument
-
-### Test the action creators
-#### Import the action types, NotificationTypeFilters, and the action creators into src/actions/notificationActionCreators.test.js
-
-#### In this file, write a test for the markAsread action. Calling the creator with 1 as an argument should return:
+### Define the MARK_AS_READ action
+#### When the action creator sends the action MARK_AS_READ, it also sends an index corresponding to the id of the notification to update. The action would look like:
 
 ```
 {
   type: MARK_AS_READ,
-  index: 1
+  index: 2
+}
+The expected data from the reducer should be:
+
+{
+  filter: "DEFAULT",
+  notifications: [
+    {
+      id: 1,
+      isRead: false,
+      type: "default",
+      value: "New course available"
+    },
+    {
+      id: 2,
+      isRead: true,
+      type: "urgent",
+      value: "New resume available"
+    },
+    {
+      id: 3,
+      isRead: false,
+      type: "urgent",
+      value: "New data available"
+    }
+  ]
 }
 ```
 
-#### Write a test for the setNotificationFilter action. Calling the creator with one of the filters from NotificationTypeFilters as an argument should return:
+### Define the SET_TYPE_FILTER action
+#### When the action creator sends the action SET_TYPE_FILTER, it also sends a filter attribute with either DEFAULT or URGENT. The action would look like:
 
 ```
 {
   type: SET_TYPE_FILTER,
-  filter: "DEFAULT"
+  filter: "URGENT"
+}
+The expected data from the reducer should be:
+
+{
+  filter: "URGENT",
+  notifications: [
+    {
+      id: 1,
+      isRead: false,
+      type: "default",
+      value: "New course available"
+    },
+    {
+      id: 2,
+      isRead: false,
+      type: "urgent",
+      value: "New resume available"
+    },
+    {
+      id: 3,
+      isRead: false,
+      type: "urgent",
+      value: "New data available"
+    }
+  ]
 }
 ```
 
-#### Repo:
-- GitHub repository: atlas-web_react
-- Directory: 0x08_react_redux_action_creator_normalizr
-- File: task_5/dashboard/src/actions/notificationActionTypes.js, task_5/dashboard/src/actions/notificationActionCreators.js, task_5/dashboard/src/actions/notificationActionCreators.test.js
+### Tips:
+- Use ES6 for this reducer, we can look at Immutable later
 
-[Back to top](#Sections)
-__________________________________________________________________________________________________________________________________________
-## Task 6. Bound the actions
-<a name="boundTheActions"></a>
-
-#### Modify the Course actions creators:
-- bound the selectCourse action creator
-- bound the unSelectCourse action creator
-
-#### Modify the Notification actions creators:
-- bound the markAsAread action creator
-- bound the setNotificationFilter action creator
-
-#### Modify the UI actions creators:
-- bound the login action creator
-- bound the logout action creator
-- bound the displayNotificationDrawer action creator
-- bound the hideNotificationDrawer action creator
+### Requirements:
+- Try to make the update of object as efficient as possible, for example you can use ES6 Map
+- All the tests in the project should pass
 
 #### Repo:
 - GitHub repository: atlas-web_react
-- Directory: 0x08_react_redux_action_creator_normalizr
-- File: task_6/dashboard/src/actions/courseActionCreators.js, task_6/dashboard/src/actions/notificationActionCreators.js, task_6/dashboard/src/actions/uiActionCreators.js
+- Directory: react_redux_reducer_selector
+- File: task_3/dashboard/src/actions/notificationActionTypes.js, task_3/dashboard/src/reducers/notificationReducer.js, task_3/dashboard/src/reducers/notificationReducer.test.js
 
 [Back to top](#Sections)
 __________________________________________________________________________________________________________________________________________
-## Task 7. Async Action Creators
-<a name="asyncActionCreators"></a>
+## Task 4. Normalizr & Immutable
+<a name="NormalizrAndImmutable"></a>
 
-#### Set up Redux and Redux Thunk
+#### As you can see, updating a specific item in a collection is rather complicated and error prone. Using Normalizr is a good opportunity to simplify mutation
 
-#### Install redux and redux-thunk in your project
+### Course schema
+#### Create a new file schema/courses.js. In the file define a schema entity for courses. Create a function coursesNormalizer that would take data as argument and normalize the data with the schema you created.
 
-#### Simulate an API
+### In the course reducer function:
+- Update the initial state to use an Immutable.js Map
+- When FETCH_COURSE_SUCCESS action is called, normalize the data with the function you created and merge it with the state
+- When SELECT_COURSE or UNSELECT_COURSE is called, use the setIn function from Immutable to update the value of the item
 
-#### Copy the file login-success.json into the dist folder. You can do the same with the notifications.json file as well now
+### Update the notification schema
+#### In the file schema/notifications.js, create a function notificationsNormalizer that would take data as argument and normalize it with the notification schema you created in the previous course.
 
-#### These files will be available on the web server and will be your own API
+### Update the notification reducer
+#### In the notification reducer function:
+- Update the initial state to use an Immutable.js Map
+- When FETCH_NOTIFICATIONS_SUCCESS action is called, normalize the data with the function notificationsNormalizer you created and merge it with the state
+- When SET_TYPE_FILTER, use the set function from Immutable to update the value of the state
+- When MARK_AS_READ, use the setIn function from Immutable to update the value of the item in the state
 
-#### Create the first Async Action Creator
-
-#### Modify the file named uiActionTypes.js, add two action types:
-- LOGIN_SUCCESS
-- LOGIN_FAILURE
-
-#### Modify the uiActionCreators file:
-- Create a loginSuccess action creator, that will return the previously created type
-- Create a loginFailure action creator, that will return the previously created type
-
-#### Create a loginRequest function that takes into argument the email and password of the user:
-- the function should dispatch the login action using the action creator previously created
-- the function should fetch the API /login-success.json and if it succeeds, dispatch the loginSuccess action
-- if the API fails, dispatch the loginFailure action
-
-### Write the tests
-
-#### In the file uiActionCreators.test.js, write a test suite for the loginRequest action:
-- the first test should verify that if the API returns the right response, the store received two actions LOGIN and LOGING_SUCCESS
-- the first test should verify that if the API query fails, the store received two actions LOGIN and LOGIN_FAILURE
+### Update the test files/suites:
+- Update the course reducer test file to match the new reducer
 
 ### Tips:
-- You can use node-fetch to query an API
-- You can install redux-mock-store and fetch-mock to simular the API and simulate the store
-- With fetch-mock, you can use getOnce and get to simulate success and failures
+- You can use the fromJS function from Immutable.js to easily create the initial state from an object
+- You can use the toJS function from Immutable.js to easily compare the expected data
+- Selecting an unselecting a course item should only take one line now
+- Marking a notification item as read should only take one line now
 
 ### Requirements:
 - All the tests in the project should pass
 
 #### Repo:
 - GitHub repository: atlas-web_react
-- Directory: 0x08_react_redux_action_creator_normalizr
-- File: task_7/dashboard/src/actions/uiActionTypes.js, task_7/dashboard/src/actions/uiActionCreators.js, task_7/dashboard/src/actions/uiActionCreators.test.js
+- Directory: react_redux_reducer_selector
+- File: task_4/dashboard/src/schema/courses.js, task_4/dashboard/src/reducers/courseReducer.js, task_4/dashboard/src/schema/notifications.js, task_4/dashboard/src/reducers/notificationReducer.js, task_4/dashboard/src/reducers/courseReducer.test.js, task_4/dashboard/src/reducers/notificationReducer.test.js
+
+[Back to top](#Sections)
+__________________________________________________________________________________________________________________________________________
+## Task 5. Selectors
+<a name="selectors"></a>
+
+#### Selectors are an efficient way to access the data from the state because a selector is not recomputed unless one of its arguments change.
+
+#### Let’s create a few selectors for the Notifications reducer in src/selectors/notificationSelector.js
+- Create a first selector for the filter named filterTypeSelected, that will return the value of the filter
+- Create another selector for the notifications named getNotifications, that will return the list of notifications in a Map format
+- Create another selector for the notifications named getUnreadNotifications, that will return the list of unread notifications in a Map format
+
+#### Create a test suite for your selectors in a file named src/selectors/notificationSelector.test.js:
+- test that filterTypeSelected works as expected
+- test that getNotifications returns a list of the message entities within the reducer
+- test that getUnreadNotifications return a list of the message entities within the reducer
+
+### Tips:
+- To write your tests, you can have a state variable using the reducer you created. And pass the state to the selector functions
+- You can also look into using Reselect for your own projects when you have advanced needs for filtering, reducing and merging data from the state
+
+### Requirements:
+- All the tests in the project should pass
+
+#### Repo:
+- GitHub repository: atlas-web_react
+- Directory: react_redux_reducer_selector
+- File: task_5/dashboard/src/selectors/notificationSelector.js, task_5/dashboard/src/selectors/notificationSelector.test.js
 
 [Back to top](#Sections)
