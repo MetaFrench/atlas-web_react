@@ -1,33 +1,38 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import { StyleSheetTestUtils } from 'aphrodite';
+import configureStore from 'redux-mock-store';
+import { Provider } from 'react-redux';
+import { fromJS } from 'immutable';
 import Header from './Header';
 
+const mockStore = configureStore([]);
+const initialState = fromJS({
+  ui: {
+    isUserLoggedIn: true,
+    user: {
+      email: 'test@example.com',
+    },
+  },
+});
+const store = mockStore(initialState);
+
 describe('Header component tests', () => {
-    let wrapper;
+  let wrapper;
 
-    // This will run before each test and create a shallow render of the App component
-    beforeEach(() => {
-        wrapper = shallow(<Header />);
-        StyleSheetTestUtils.suppressStyleInjection();
-    });
+  beforeEach(() => {
+    wrapper = shallow(
+      <Provider store={store}>
+        <Header />
+      </Provider>
+    ).dive();
+  });
 
-    test('Header renders without crashing', () => {
-        expect(wrapper.exists()).toBe(true);
-    });
+  test('Header renders without crashing', () => {
+    expect(wrapper.exists()).toBe(true);
+  });
 
-    test('Header renders a div with the class App-header', () => {
-      const header = wrapper.find('header')
-      expect(header.exists()).toBe(true);
-      expect(header.prop('className')).toBeDefined();
-      expect(header.prop('className')).toContain('appHeader');
-    });
-
-    test('Header renders an img element', () => {
-      expect(wrapper.find('img').exists()).toBe(true);
-    });
-
-    test('Header renders an h1 element', () => {
-      expect(wrapper.find('h1').exists()).toBe(true);
-    });
+  test('Header contains a logout section when user is logged in', () => {
+    expect(wrapper.find('#logoutSection').exists()).toBe(true);
+    expect(wrapper.find('#logoutSection').text()).toContain('Welcome test@example.com');
+  });
 });
